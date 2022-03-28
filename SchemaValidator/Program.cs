@@ -8,6 +8,7 @@ using System.Xml.XPath;
 class XPathValidation
 {
     private static Dictionary<string,XmlReaderSettings> schemaSettings = new Dictionary<string, XmlReaderSettings>();
+    private static int _validationErrorCount = 0;
     static void Init(string xsdRootPath)
     {
 
@@ -16,63 +17,123 @@ class XPathValidation
         settings.Schemas.Add("", Path.Combine(xsdRootPath,"ISO11783_TaskFile_V4-3.xsd"));
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_Common_V4-3.xsd"));
         settings.ValidationType = ValidationType.Schema;
+        settings.ValidationFlags =
+            XmlSchemaValidationFlags.ReportValidationWarnings |
+            XmlSchemaValidationFlags.ProcessIdentityConstraints |
+            XmlSchemaValidationFlags.ProcessInlineSchema |
+            XmlSchemaValidationFlags.ProcessSchemaLocation;
         schemaSettings.Add("4.3_TaskData",settings);
 
         settings = new XmlReaderSettings();
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_TaskFile_V4-2.xsd"));
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_Common_V4-2.xsd"));
         settings.ValidationType = ValidationType.Schema;
+        settings.ValidationFlags =
+            XmlSchemaValidationFlags.ReportValidationWarnings |
+            XmlSchemaValidationFlags.ProcessIdentityConstraints |
+            XmlSchemaValidationFlags.ProcessInlineSchema |
+            XmlSchemaValidationFlags.ProcessSchemaLocation;
         schemaSettings.Add("4.2_TaskData", settings);
 
 
         settings = new XmlReaderSettings();
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_TaskFile_V4-0.xsd"));
         settings.ValidationType = ValidationType.Schema;
+        settings.ValidationFlags =
+            XmlSchemaValidationFlags.ReportValidationWarnings |
+            XmlSchemaValidationFlags.ProcessIdentityConstraints |
+            XmlSchemaValidationFlags.ProcessInlineSchema |
+            XmlSchemaValidationFlags.ProcessSchemaLocation;
         schemaSettings.Add("4.0_TaskData", settings);
 
         settings = new XmlReaderSettings();
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_TaskFile_V3-3.xsd"));
         settings.ValidationType = ValidationType.Schema;
+        settings.ValidationFlags =
+            XmlSchemaValidationFlags.ReportValidationWarnings |
+            XmlSchemaValidationFlags.ProcessIdentityConstraints |
+            XmlSchemaValidationFlags.ProcessInlineSchema |
+            XmlSchemaValidationFlags.ProcessSchemaLocation;
         schemaSettings.Add("3.3_TaskData", settings);
 
         settings = new XmlReaderSettings();
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_TaskFile_V3-2.xsd"));
         settings.ValidationType = ValidationType.Schema;
+        settings.ValidationFlags =
+            XmlSchemaValidationFlags.ReportValidationWarnings |
+            XmlSchemaValidationFlags.ProcessIdentityConstraints |
+            XmlSchemaValidationFlags.ProcessInlineSchema |
+            XmlSchemaValidationFlags.ProcessSchemaLocation;
         schemaSettings.Add("3.2_TaskData", settings);
 
         settings = new XmlReaderSettings();
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_TaskFile_V3-1.xsd"));
         settings.ValidationType = ValidationType.Schema;
+        settings.ValidationFlags =
+            XmlSchemaValidationFlags.ReportValidationWarnings |
+            XmlSchemaValidationFlags.ProcessIdentityConstraints |
+            XmlSchemaValidationFlags.ProcessInlineSchema |
+            XmlSchemaValidationFlags.ProcessSchemaLocation;
         schemaSettings.Add("3.1_TaskData", settings);
 
         settings = new XmlReaderSettings();
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_TaskFile_V3-0.xsd"));
         settings.ValidationType = ValidationType.Schema;
+        settings.ValidationFlags =
+            XmlSchemaValidationFlags.ReportValidationWarnings |
+            XmlSchemaValidationFlags.ProcessIdentityConstraints |
+            XmlSchemaValidationFlags.ProcessInlineSchema |
+            XmlSchemaValidationFlags.ProcessSchemaLocation;
         schemaSettings.Add("3.0_TaskData", settings);
 
         settings = new XmlReaderSettings();
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_TaskFile_V2-1.xsd"));
         settings.ValidationType = ValidationType.Schema;
+        settings.ValidationFlags =
+            XmlSchemaValidationFlags.ReportValidationWarnings |
+            XmlSchemaValidationFlags.ProcessIdentityConstraints |
+            XmlSchemaValidationFlags.ProcessInlineSchema |
+            XmlSchemaValidationFlags.ProcessSchemaLocation;
         schemaSettings.Add("2.1_TaskData", settings);
 
         settings = new XmlReaderSettings();
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_TaskFile_V2-0.xsd"));
         settings.ValidationType = ValidationType.Schema;
+        settings.ValidationFlags =
+            XmlSchemaValidationFlags.ReportValidationWarnings |
+            XmlSchemaValidationFlags.ProcessIdentityConstraints |
+            XmlSchemaValidationFlags.ProcessInlineSchema |
+            XmlSchemaValidationFlags.ProcessSchemaLocation;
         schemaSettings.Add("2.0_TaskData", settings);
         
         settings = new XmlReaderSettings();
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_TimeLog_V4-3.xsd"));
         settings.ValidationType = ValidationType.Schema;
+        settings.ValidationFlags =
+            XmlSchemaValidationFlags.ReportValidationWarnings |
+            XmlSchemaValidationFlags.ProcessIdentityConstraints |
+            XmlSchemaValidationFlags.ProcessInlineSchema |
+            XmlSchemaValidationFlags.ProcessSchemaLocation;
         schemaSettings.Add("4.3_TimeLog", settings);
         
         settings = new XmlReaderSettings();
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_LinkListFile_V4-3.xsd"));
         settings.ValidationType = ValidationType.Schema;
+        settings.ValidationFlags =
+            XmlSchemaValidationFlags.ReportValidationWarnings |
+            XmlSchemaValidationFlags.ProcessIdentityConstraints |
+            XmlSchemaValidationFlags.ProcessInlineSchema |
+            XmlSchemaValidationFlags.ProcessSchemaLocation;
         schemaSettings.Add("4.3_LinkList", settings);
 
         settings = new XmlReaderSettings();
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_LinkListFile_V4-2.xsd"));
         settings.ValidationType = ValidationType.Schema;
+        settings.ValidationFlags =
+            XmlSchemaValidationFlags.ReportValidationWarnings |
+            XmlSchemaValidationFlags.ProcessIdentityConstraints |
+            XmlSchemaValidationFlags.ProcessInlineSchema |
+            XmlSchemaValidationFlags.ProcessSchemaLocation;
         schemaSettings.Add("4.2_LinkList", settings);
 
 
@@ -80,29 +141,64 @@ class XPathValidation
         settings = new XmlReaderSettings();
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_ExternalFile_V2-0.xsd"));
         settings.ValidationType = ValidationType.Schema;
+        settings.ValidationFlags =
+            XmlSchemaValidationFlags.ReportValidationWarnings |
+            XmlSchemaValidationFlags.ProcessIdentityConstraints |
+            XmlSchemaValidationFlags.ProcessInlineSchema |
+            XmlSchemaValidationFlags.ProcessSchemaLocation;
         schemaSettings.Add("2.0_ExternalFile", settings);
         
         settings = new XmlReaderSettings();
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_ExternalFile_V3-0.xsd"));
         settings.ValidationType = ValidationType.Schema;
+        settings.ValidationFlags =
+            XmlSchemaValidationFlags.ReportValidationWarnings |
+            XmlSchemaValidationFlags.ProcessIdentityConstraints |
+            XmlSchemaValidationFlags.ProcessInlineSchema |
+            XmlSchemaValidationFlags.ProcessSchemaLocation;
         schemaSettings.Add("3.0_ExternalFile", settings);
         
         settings = new XmlReaderSettings();
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_ExternalFile_V4-0.xsd"));
         settings.ValidationType = ValidationType.Schema;
+        settings.ValidationFlags =
+            XmlSchemaValidationFlags.ReportValidationWarnings |
+            XmlSchemaValidationFlags.ProcessIdentityConstraints |
+            XmlSchemaValidationFlags.ProcessInlineSchema |
+            XmlSchemaValidationFlags.ProcessSchemaLocation;
         schemaSettings.Add("4.0_ExternalFile", settings);
 
         settings = new XmlReaderSettings();
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_ExternalFile_V4-2.xsd"));
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_Common_V4-2.xsd"));
         settings.ValidationType = ValidationType.Schema;
+        settings.ValidationFlags =
+            XmlSchemaValidationFlags.ReportValidationWarnings |
+            XmlSchemaValidationFlags.ProcessIdentityConstraints |
+            XmlSchemaValidationFlags.ProcessInlineSchema |
+            XmlSchemaValidationFlags.ProcessSchemaLocation;
         schemaSettings.Add("4.2_ExternalFile", settings);
         
         settings = new XmlReaderSettings();
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_ExternalFile_V4-3.xsd"));
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_Common_V4-3.xsd"));
         settings.ValidationType = ValidationType.Schema;
+        settings.ValidationFlags =
+            XmlSchemaValidationFlags.ReportValidationWarnings |
+            XmlSchemaValidationFlags.ProcessIdentityConstraints |
+            XmlSchemaValidationFlags.ProcessInlineSchema |
+            XmlSchemaValidationFlags.ProcessSchemaLocation;
         schemaSettings.Add("4.3_ExternalFile", settings);
+
+        settings = new XmlReaderSettings();
+        settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_TimeLog_V4-3.xsd"));
+        settings.ValidationType = ValidationType.Schema;
+        settings.ValidationFlags =
+            XmlSchemaValidationFlags.ReportValidationWarnings |
+            XmlSchemaValidationFlags.ProcessIdentityConstraints |
+            XmlSchemaValidationFlags.ProcessInlineSchema |
+            XmlSchemaValidationFlags.ProcessSchemaLocation;
+        schemaSettings.Add("4.3_TimeLogFile", settings);
     }
 
     private static string rootPath = "C:\\src\\AEF\\ISOBUS-XML-schema\\test";
@@ -125,7 +221,7 @@ class XPathValidation
         } else if (rootNode.Name.Equals("ISO11783LinkList"))
         {
             return rootNode.Attributes["VersionMajor"].Value + "." + rootNode.Attributes["VersionMinor"].Value + "_LinkList";
-        } else if (rootNode.Name.Equals("TLG"))
+        } else if (rootNode.Name.Equals("TIM"))
         {
             return "4.3_TimeLog";//There is no versioning in TLGs
         } else if (rootNode.Name.Equals("XFC"))
@@ -138,6 +234,8 @@ class XPathValidation
 
     static void Test(string filePath)
     {
+        string resultIndicator = filePath.Substring(filePath.Length - "fails.xml".Length, "fails".Length);
+        bool shallFail = false || resultIndicator.Equals("fails");
         try
         {
             Console.WriteLine("============================================");
@@ -156,25 +254,50 @@ class XPathValidation
                 document.Load(reader);
                 ValidationEventHandler eventHandler = new ValidationEventHandler(ValidationEventHandler);
                 document.Validate(eventHandler);
+                if (shallFail) //If we reach this, something went wrong
+                {
+                    Console.WriteLine("=================================");
+                    Console.WriteLine("===========ERROR!================");
+                    Console.WriteLine("=================================");
+                    Console.WriteLine("File "+filePath+"Should have failed but didn't");
+                    _validationErrorCount++;
+                }
+                else
+                {  
+                    Console.WriteLine("Success: No Error found, no error expected");
+                }
             }
             else
             {
                 Console.WriteLine("Could not find corresponding Schema definition");
+                _validationErrorCount++;
             }
 
 
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            if (!shallFail) //If we reach this, something went wrong
+            {
+                Console.WriteLine("=================================");
+                Console.WriteLine("===========ERROR!================");
+                Console.WriteLine("=================================");
+                Console.WriteLine("File " + filePath + "Should not have failed but did!");
+                Console.WriteLine(ex.Message);
+                _validationErrorCount++;
+            }
+            else
+            {
+                Console.WriteLine("Success! Error: " + ex.Message);
+            }
         }
 
     }
 
-    static void Main()
+    static int Main()
     {
-        string testFolder = "C:\\src\\AEF\\ISOBUS-XML-schema\\test";
-        string xsdRootPath = "C:\\src\\AEF\\ISOBUS-XML-schema\\";
+        string testFolder = "C:\\src\\AEF\\ISOXML-Schema\\ISOBUS-XML-schema\\test";
+        string xsdRootPath = "C:\\src\\AEF\\ISOXML-Schema\\ISOBUS-XML-schema";
 
         Init(xsdRootPath);
         foreach (var file in Directory.GetFiles(testFolder))
@@ -185,6 +308,22 @@ class XPathValidation
             }
 
         }
+
+        if (_validationErrorCount == 0)
+        {
+            Console.WriteLine("##################################################");
+            Console.WriteLine("             SUCCESS");
+            Console.WriteLine("##################################################");
+        }
+        else
+        {
+            Console.WriteLine("##################################################");
+            Console.WriteLine("             ERROR");
+            Console.WriteLine("##################################################");
+
+        }
+
+        return _validationErrorCount;
     }
 
     static void ValidationEventHandler(object sender, ValidationEventArgs e)
