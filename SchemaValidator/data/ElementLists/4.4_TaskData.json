@@ -1,0 +1,98 @@
+{
+  "VersionMajor": 4,
+  "VersionMinor": 4,
+  "elements": [
+    {
+      "rootName": "ASP",
+      "children": [
+        {
+          "elementName": "PTN",
+          "minAmount": 0,
+          "maxAmount": 2
+
+        }
+      ]
+    },
+    {
+      "rootName": "DVC",
+      "children": [
+        {
+          "elementName": "DET",
+          "maxAmount": 128,
+          "minAmount": 1
+        }
+      ]
+    },
+    {
+      "rootName": "DET",
+      "children": [
+
+        {
+          "elementName": "DOR",
+          "maxAmount": 255,
+          "minAmount": 0
+        }
+      ]
+    },
+    {
+      "rootName": "GAN",
+      "children": [
+        {
+          "elementName": "ASP",
+          "maxAmount": 1,
+          "minAmount": 0
+
+        }
+      ]
+    },
+    {
+      "rootName": "GPN",
+      "children": [
+        {
+          "elementName": "LSG",
+          "maxAmount": 1,
+          "minAmount": 1
+
+        }
+      ]
+    },
+    {
+      "rootName": "ISO11783_TaskData",
+      "children": [
+        {
+          "elementName": "TCC",
+          "maxAmount": 1,
+          "minAmount": 0
+
+        }
+      ]
+    },
+    {
+      "rootName": "TSK",
+      "children": [
+        {
+          "elementName": "GRD",
+          "maxAmount": 1,
+          "minAmount": 0
+
+        },
+        {
+          "elementName": "OTP",
+          "maxAmount": 1,
+          "minAmount": 0
+
+        }
+      ]
+    },
+    {
+      "rootName": "TIM",
+      "children": [
+        {
+          "elementName": "PTN",
+          "minAmount": 0,
+          "maxAmount": 2
+        }
+      ]
+    }
+  ]
+}

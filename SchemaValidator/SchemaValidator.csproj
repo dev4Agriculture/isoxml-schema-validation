@@ -5,4 +5,14 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="data\ElementLists\4.4_TaskData.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="data\ElementLists\4.4_TaskData.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

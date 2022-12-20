@@ -4,12 +4,17 @@ using System.IO;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.XPath;
+using System.Xml.Linq;
+using System.Text.RegularExpressions;
 
 class XPathValidation
 {
     private static Dictionary<string,XmlReaderSettings> schemaSettings = new Dictionary<string, XmlReaderSettings>();
+    private static Dictionary<string, ElementLimitList> elementLimitDict = new Dictionary<string, ElementLimitList>();
     private static int _validationErrorCount = 0;
-    static void Init(string xsdRootPath)
+    private static readonly Regex proprietaryRegEx = new Regex("P\\d\\d\\d_[a-zA-Z]+", RegexOptions.IgnoreCase);
+
+    static void LoadXSDFiles(string xsdRootPath)
     {
         //-----------------------------TASKDATA-------------------------------------------------------------------------
         XmlReaderSettings settings = new XmlReaderSettings();
@@ -24,7 +29,7 @@ class XPathValidation
         schemaSettings.Add("4.4_TaskData", settings);
 
         settings = new XmlReaderSettings();
-        settings.Schemas.Add("", Path.Combine(xsdRootPath,"ISO11783_TaskFile_V4-3.xsd"));
+        settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_TaskFile_V4-3.xsd"));
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_Common_V4-3.xsd"));
         settings.ValidationType = ValidationType.Schema;
         settings.ValidationFlags =
@@ -32,7 +37,7 @@ class XPathValidation
             XmlSchemaValidationFlags.ProcessIdentityConstraints |
             XmlSchemaValidationFlags.ProcessInlineSchema |
             XmlSchemaValidationFlags.ProcessSchemaLocation;
-        schemaSettings.Add("4.3_TaskData",settings);
+        schemaSettings.Add("4.3_TaskData", settings);
 
         settings = new XmlReaderSettings();
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_TaskFile_V4-2.xsd"));
@@ -128,7 +133,7 @@ class XPathValidation
             XmlSchemaValidationFlags.ProcessInlineSchema |
             XmlSchemaValidationFlags.ProcessSchemaLocation;
         schemaSettings.Add("4.2_LinkList", settings);
-        
+
         settings = new XmlReaderSettings();
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_LinkListFile_V4-3.xsd"));
         settings.ValidationType = ValidationType.Schema;
@@ -161,7 +166,7 @@ class XPathValidation
             XmlSchemaValidationFlags.ProcessInlineSchema |
             XmlSchemaValidationFlags.ProcessSchemaLocation;
         schemaSettings.Add("2.0_ExternalFile", settings);
-        
+
         settings = new XmlReaderSettings();
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_ExternalFile_V3-0.xsd"));
         settings.ValidationType = ValidationType.Schema;
@@ -171,7 +176,7 @@ class XPathValidation
             XmlSchemaValidationFlags.ProcessInlineSchema |
             XmlSchemaValidationFlags.ProcessSchemaLocation;
         schemaSettings.Add("3.0_ExternalFile", settings);
-        
+
         settings = new XmlReaderSettings();
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_ExternalFile_V4-0.xsd"));
         settings.ValidationType = ValidationType.Schema;
@@ -192,7 +197,7 @@ class XPathValidation
             XmlSchemaValidationFlags.ProcessInlineSchema |
             XmlSchemaValidationFlags.ProcessSchemaLocation;
         schemaSettings.Add("4.2_ExternalFile", settings);
-        
+
         settings = new XmlReaderSettings();
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_ExternalFile_V4-3.xsd"));
         settings.Schemas.Add("", Path.Combine(xsdRootPath, "ISO11783_Common_V4-3.xsd"));
@@ -238,9 +243,25 @@ class XPathValidation
             XmlSchemaValidationFlags.ProcessInlineSchema |
             XmlSchemaValidationFlags.ProcessSchemaLocation;
         schemaSettings.Add("4.4_TimeLogFile", settings);
+
     }
 
-    private static string rootPath = "C:\\src\\AEF\\ISOBUS-XML-schema\\test";
+    static void Init(string xsdRootPath, string elementsListRootPath)
+    {
+        LoadXSDFiles(xsdRootPath);
+        LOadElementsLists(elementsListRootPath);
+    }
+
+    private static void LOadElementsLists(string elementsListRootPath)
+    {
+        foreach(var file in Directory.GetFiles(elementsListRootPath))
+        {
+            if(file.EndsWith(".json"))
+            {
+                elementLimitDict.Add(Path.GetFileName(file).Replace(".json",""),ElementLimitList.FromJSONFile(file));
+            }
+        }
+    }
 
     static string getSchemaDefinitionName(XmlDocument document)
     {
@@ -271,7 +292,9 @@ class XPathValidation
         return "";
     }
 
-    static void Test(string filePath)
+
+
+    static void Test(string filePath, string rootFolder)
     {
         string resultIndicator = filePath.Substring(filePath.Length - "fails.xml".Length, "fails".Length);
         bool shallFail = false || resultIndicator.Equals("fails");
@@ -280,19 +303,22 @@ class XPathValidation
             Console.WriteLine("============================================");
             Console.WriteLine("Starting Test of File: " + filePath);
             //TODO: Reading the file twice is just not sexy :( 
-            XmlReader reader = XmlReader.Create(Path.Combine(rootPath,filePath));
+            XmlReader reader = XmlReader.Create(Path.Combine(rootFolder,filePath));
             XmlDocument document = new XmlDocument();
             document.Load(reader);
-
+            // Remove all proprietary Elements
+            //document = RemoveProprietaryElements(document);
             var schemaName = getSchemaDefinitionName(document);
             XmlReaderSettings settings = null;
             if (schemaSettings.TryGetValue(schemaName, out settings))
             {
-                reader = XmlReader.Create(Path.Combine(rootPath, filePath), settings);
+                reader = XmlReader.Create(Path.Combine(rootFolder, filePath), settings);
                 document = new XmlDocument();
                 document.Load(reader);
                 ValidationEventHandler eventHandler = new ValidationEventHandler(ValidationEventHandler);
                 document.Validate(eventHandler);
+                //Test the LimitAmounts for different Elements
+                CheckElementLimits(document,schemaName);
                 if (shallFail) //If we reach this, something went wrong
                 {
                     Console.WriteLine("=================================");
@@ -333,17 +359,64 @@ class XPathValidation
 
     }
 
+    private static void CheckElementLimits(XmlDocument document, string schemaName)
+    {
+        if( elementLimitDict.TryGetValue(schemaName, out var limits))
+        {
+            limits.CheckXMLDocument(document);
+        }
+    }
+
+    private static XmlNode CleanNodeFromProprietaryElements(XmlNode xmlNode)
+    {
+        if(!xmlNode.NodeType.Equals(XmlNodeType.Element))
+        {
+            return xmlNode;
+        }
+        foreach (XmlAttribute attribute in xmlNode.Attributes)
+        {
+            if(proprietaryRegEx.IsMatch(attribute.Name))
+            {
+                xmlNode.Attributes.Remove(attribute);
+            }
+        }
+        XPathNavigator navigator = xmlNode.CreateNavigator();
+        XPathNodeIterator iterator = navigator.Select("");
+        foreach (XmlNode child in iterator)
+        {
+            if(proprietaryRegEx.IsMatch(child.Name))
+            {
+                xmlNode.RemoveChild(child);
+            } else
+            {
+                CleanNodeFromProprietaryElements(child);
+            }
+        }
+
+        return xmlNode;
+    }
+
+    private static XmlDocument RemoveProprietaryElements(XmlDocument document)
+    {
+        foreach( XmlNode child in document.ChildNodes)
+        {
+            CleanNodeFromProprietaryElements(child);
+        }
+        return document;
+    }
+
     static int Main()
     {
         string testFolder = "C:\\src\\AEF\\ISOXML-Schema\\ISOBUS-XML-schema\\test";
         string xsdRootPath = "C:\\src\\AEF\\ISOXML-Schema\\ISOBUS-XML-schema";
+        string elementsListRootPath = ".\\data\\ElementLists\\";
 
-        Init(xsdRootPath);
+        Init(xsdRootPath, elementsListRootPath);
         foreach (var file in Directory.GetFiles(testFolder))
         {
             if (file.EndsWith(".xml"))
             {
-                Test(Path.Combine(testFolder,file));
+                Test(file,testFolder);
             }
 
         }
