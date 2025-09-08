@@ -5,3 +5,4 @@
 /.vs
 /SchemaValidator/bin/Debug/netcoreapp3.1
 /SchemaValidator/obj
+/SchemaValidator/bin/Debug/net9.0
